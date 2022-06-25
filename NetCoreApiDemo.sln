@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FCB844D4-8B5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{579D6E37-3745-4B9D-8B05-7F34BA51B0A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.DemoApi.Web", "src\Web\RToora.DemoApi.Web\RToora.DemoApi.Web.csproj", "{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.DemoApi.Web", "src\Web\RToora.DemoApi.Web.csproj", "{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.DemoApi.Web.Tests", "test\Web\RToora.DemoApi.Web.Tests\RToora.DemoApi.Web.Tests.csproj", "{D6613E60-F5D2-4463-9B70-386A36677DA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.DemoApi.Web.Tests", "test\Web\RToora.DemoApi.Web.Tests.csproj", "{D6613E60-F5D2-4463-9B70-386A36677DA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
