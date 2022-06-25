@@ -1,4 +1,4 @@
-name: build
+name: build and test
 
 on:
   push:
@@ -9,9 +9,9 @@ env:
   DOTNET_VERSION: '6.0.x'
 
 jobs:
-  build:
+  build-and-test:
 
-    name: build-${{matrix.os}}
+    name: build-and-test-${{matrix.os}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,7 +30,6 @@ jobs:
       
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    
-    # NOT currently needed
-    #- name: Test
-      #run: dotnet test --no-build --verbosity normal
+        
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
