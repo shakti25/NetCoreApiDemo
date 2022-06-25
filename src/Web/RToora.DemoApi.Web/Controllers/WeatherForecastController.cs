@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace RToora.Demo.API.Controllers
+namespace RToora.DemoApi.Web.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -8,8 +8,8 @@ namespace RToora.Demo.API.Controllers
     {
         private static readonly string[] Summaries = new[]
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
 
         private readonly ILogger<WeatherForecastController> _logger;
 

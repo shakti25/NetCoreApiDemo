@@ -1,4 +1,4 @@
-namespace RToora.Demo.API
+namespace RToora.DemoApi.Web
 {
     public class WeatherForecast
     {

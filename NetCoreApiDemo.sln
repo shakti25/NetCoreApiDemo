@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.Demo.API", "RToora.Demo.API\RToora.Demo.API.csproj", "{9139BB68-96C8-422C-856A-CBF6D4202A2F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FCB844D4-8B52-4CFD-8BA2-B0A5A6B166C0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{579D6E37-3745-4B9D-8B05-7F34BA51B0A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RToora.DemoApi.Web", "src\Web\RToora.DemoApi.Web\RToora.DemoApi.Web.csproj", "{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,13 +15,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9139BB68-96C8-422C-856A-CBF6D4202A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9139BB68-96C8-422C-856A-CBF6D4202A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9139BB68-96C8-422C-856A-CBF6D4202A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9139BB68-96C8-422C-856A-CBF6D4202A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A94EDDCC-5532-4225-9CD9-433EA4C5EE55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A94EDDCC-5532-4225-9CD9-433EA4C5EE55} = {FCB844D4-8B52-4CFD-8BA2-B0A5A6B166C0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {500A2F50-5794-455B-9F28-AD30030C44FA}
