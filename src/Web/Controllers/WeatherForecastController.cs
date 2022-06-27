@@ -21,6 +21,8 @@ namespace RToora.DemoApi.Web.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            var greeting = "This is a random test";
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
