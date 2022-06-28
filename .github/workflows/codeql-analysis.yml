@@ -12,8 +12,8 @@ on:
       - "**.cs"
       - "**.csproj"
   schedule:
-    # *(minute (0-59)) *(hour (0-23)) *(day of the month (1-31)) *(month (1-12)) *(day of the week (0-6))
-    - cron: "* 5 28 6 *"
+    # Runs every Sunday at 1:00 am
+    - cron: "0 1 * * 0"
 
 jobs:
   analyze:
@@ -29,19 +29,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - run: git checkout HEAD^2
-        if: ${{ github.even_name == 'pull_request' }}
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+        uses: github/codeql-action/autobuild@v2
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
