@@ -1,16 +1,17 @@
 name: CodeQL
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "**.cs"
-      - "**.csproj"
-  pull_request:
-    branches: [main]
-    paths:
-      - "**.cs"
-      - "**.csproj"
+  # Should only run every Sunday at 1:00 am
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - "**.cs"
+  #     - "**.csproj"
+  # pull_request:
+  #   branches: [main]
+  #   paths:
+  #     - "**.cs"
+  #     - "**.csproj"
   schedule:
     # Runs every Sunday at 1:00 am
     - cron: "0 1 * * 0"

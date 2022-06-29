@@ -1,13 +1,15 @@
 name: publish
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["build/test"]
+    types:
+      - "completed"
 
 env:
   AZURE_WEBAPP_NAME: dotnetdemoapi
   AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
-  DOTNET_VERSION: '6.0.X' # The .NET SDK version to use
+  DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
 
 jobs:
   publish:
