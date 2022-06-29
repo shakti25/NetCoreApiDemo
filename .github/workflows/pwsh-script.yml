@@ -1,0 +1,18 @@
+name: pwsh script
+
+on: 
+  workflow_dispatch
+
+jobs:
+  powershell:
+    name: Run Pwsh Script
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pwsh Script
+        run: ./scripts/script.ps1
+        shell: pwsh
+        env:
+          MyVariable: 'Hello, World'
