@@ -33,7 +33,7 @@ jobs:
         run: |
           cd src/Web
           dotnet build -c Release --no-restore
-          dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+          dotnet publish -c Release -o ../dotnet-api -r linux-x64 --self-contained true /p:UseAppHost=true
 
       - name: Test
         run: |
@@ -45,6 +45,6 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dotnet-webapp'
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/src/dotnet-api'
 
       
