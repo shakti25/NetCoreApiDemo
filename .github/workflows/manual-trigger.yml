@@ -1,11 +1,19 @@
 name: manual action
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+        required: false
 
 jobs:
 
-  jobA:
+  process:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,6 +21,11 @@ jobs:
 
       - name: Greet
         run: echo "Hi, this is a manual test"
+
+      - name: Input variables
+        run: |
+          echo "Log level: ${{ github.event.inputs.logLevel }}"
+          echo "Tags: ${{ github.event.inputs.tags }}"
 
       - name: Secret value
         run: echo ${{ secrets.SECRET_GREETING }}
