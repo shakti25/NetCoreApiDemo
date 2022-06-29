@@ -13,3 +13,6 @@ jobs:
     steps:
       - name: Run a one-line script
         run : echo Hello, world!
+
+      - name: Display Secret message
+        run: echo ${{ secrets.SECRET_GREETING }}
