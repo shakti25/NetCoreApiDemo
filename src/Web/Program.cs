@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using RToora.DemoApi.Web.DB;
+using RToora.DemoApi.Web.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

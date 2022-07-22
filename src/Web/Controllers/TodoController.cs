@@ -2,29 +2,28 @@
 using Microsoft.EntityFrameworkCore;
 using RToora.DemoApi.Web.DB;
 using RToora.DemoApi.Web.Models;
+using RToora.DemoApi.Web.Repository;
 
 namespace RToora.DemoApi.Web.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
+[Produces("application/json")]
 public class TodoController : ControllerBase
 {
     private readonly ILogger<TodoController> _logger;
-    private readonly TodoContext _context;
+    private readonly ITodoItemRepository _todoItemRepository;
 
-    public TodoController(ILogger<TodoController> logger, TodoContext context)
+    public TodoController(ILogger<TodoController> logger, ITodoItemRepository todoItemRepository)
     {
         _logger = logger;
-        _context = context;
+        _todoItemRepository = todoItemRepository;
     }
 
     [HttpGet(Name = "GetTodoItem")]
     public async Task<IActionResult> Get()
     {
-        // To prevent from overposting attacks we are using ItemToDTO method.
-        var todoItems = await _context.TodoItems.Select(x => ItemToDTO(x)).ToListAsync();
-
-        return Ok(todoItems);
+        return Ok(await _todoItemRepository.GetTodoItems());
     }
 
     [HttpGet("{id}", Name = "GetTodoItemById")]
@@ -33,15 +32,14 @@ public class TodoController : ControllerBase
     [ProducesDefaultResponseType]
     public async Task<IActionResult> Get(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await _todoItemRepository.GetTodoItem(id);
 
         if(todoItem == null)
         {
             return NotFound();
         }
-
-        // To prevent from overposting attacks we are using ItemToDTO method.
-        return Ok(ItemToDTO(todoItem));
+        
+        return Ok(todoItem);
     }
 
     [HttpPut("{id}", Name = "UpdateTodoItem")]
@@ -56,13 +54,11 @@ public class TodoController : ControllerBase
             return BadRequest();
         }
 
-        _context.Entry(todoItem).State = EntityState.Modified;
-
         try
         {
-            await _context.SaveChangesAsync();
+            await _todoItemRepository.UpdateTodoItem(todoItem);
         }
-        catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
+        catch (DbUpdateConcurrencyException) when (!_todoItemRepository.TodoItemExists(id))
         {
             return NotFound();
         }
@@ -75,12 +71,9 @@ public class TodoController : ControllerBase
     [ProducesDefaultResponseType]
     public async Task<IActionResult> Post(TodoItem todoItem)
     {
-        _context.TodoItems.Add(todoItem);
+        var todoItemDto = await _todoItemRepository.CreateTodoItem(todoItem);
 
-        await _context.SaveChangesAsync();
-
-        // To prevent from overposting attacks we are using ItemToDTO method.
-        return CreatedAtAction(nameof(Post), new { id = todoItem.Id }, ItemToDTO(todoItem));
+        return CreatedAtAction(nameof(Post), new { id = todoItem.Id }, todoItemDto);
     }
 
     [HttpDelete("{id}", Name = "DeleteTodoItem")]
@@ -89,29 +82,15 @@ public class TodoController : ControllerBase
     [ProducesDefaultResponseType]
     public async Task<IActionResult> Delete(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await _todoItemRepository.DeleteTodoItem(id);
 
         if(todoItem == null)
         {
             return NotFound();
         }
 
-        _context.TodoItems.Remove(todoItem);
-
-        await _context.SaveChangesAsync();
-
         return NoContent();
     }
 
-    private bool TodoItemExists(long id)
-    {
-        return _context.TodoItems.Any(e => e.Id == id);
-    }
-
-    private static TodoItemDTO ItemToDTO(TodoItem todoItem) => new TodoItemDTO
-    {
-        Id = todoItem.Id,
-        Name = todoItem.Name,
-        IsComplete = todoItem.IsComplete
-    };
+    
 }
