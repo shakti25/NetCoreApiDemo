@@ -1,95 +1,137 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RToora.DemoApi.Web.DB;
 using RToora.DemoApi.Web.Models;
-using RToora.DemoApi.Web.Repository;
+using RToora.DemoApi.Web.Services;
 
 namespace RToora.DemoApi.Web.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
-[Produces("application/json")]
 public class TodoController : ControllerBase
 {
     private readonly ILogger<TodoController> _logger;
-    private readonly ITodoItemRepository _todoItemRepository;
+    private readonly ITodoItemService _todoItemService;
 
-    public TodoController(ILogger<TodoController> logger, ITodoItemRepository todoItemRepository)
+    public TodoController(ILogger<TodoController> logger, ITodoItemService todoItemService)
     {
         _logger = logger;
-        _todoItemRepository = todoItemRepository;
+        _todoItemService = todoItemService;
     }
 
     [HttpGet(Name = "GetTodoItem")]
     public async Task<IActionResult> Get()
     {
-        return Ok(await _todoItemRepository.GetTodoItems());
-    }
-
-    [HttpGet("{id}", Name = "GetTodoItemById")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType]
-    public async Task<IActionResult> Get(long id)
-    {
-        var todoItem = await _todoItemRepository.GetTodoItem(id);
-
-        if(todoItem == null)
-        {
-            return NotFound();
-        }
-        
-        return Ok(todoItem);
-    }
-
-    [HttpPut("{id}", Name = "UpdateTodoItem")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType]
-    public async Task<IActionResult> Put(long id, TodoItem todoItem)
-    {
-        if (id != todoItem.Id)
-        {
-            return BadRequest();
-        }
-
         try
         {
-            await _todoItemRepository.UpdateTodoItem(todoItem);
-        }
-        catch (DbUpdateConcurrencyException) when (!_todoItemRepository.TodoItemExists(id))
-        {
-            return NotFound();
-        }
+            var todoItems = await _todoItemService.GetTodoItemsAsync();
 
-        return NoContent();
+            return Ok(todoItems ?? Array.Empty<TodoItemDTO>());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
+        }
+    }
+
+    [HttpGet("{id:long}", Name = "GetTodoItemById")]
+    public async Task<IActionResult> Get(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var todoItem = await _todoItemService.GetTodoItemByIdAsync(id, cancellationToken);
+
+            return (todoItem is not null) ?
+                Ok(todoItem) :
+                Problem(detail: $"TodoItem with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
+        }
     }
 
     [HttpPost(Name = "PostTodoItem")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesDefaultResponseType]
-    public async Task<IActionResult> Post(TodoItem todoItem)
+    public async Task<IActionResult> Post([FromBody]TodoItem todoItem, CancellationToken cancellationToken = default)
     {
-        var todoItemDto = await _todoItemRepository.CreateTodoItem(todoItem);
+        try
+        {
+            var operationResult = await _todoItemService.CreateTodoItemAsync(todoItem, cancellationToken);
 
-        return CreatedAtAction(nameof(Post), new { id = todoItem.Id }, todoItemDto);
+            ActionResult response = operationResult switch
+            {
+                { OperationResult: Common.OperationResultType.Created, Entity: { } } 
+                    => Created($"api/", operationResult.Entity),
+                { OperationResult: Common.OperationResultType.NotFound } 
+                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound, title: "Not Found"),
+                { OperationResult: Common.OperationResultType.Conflict }
+                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict, title: "Creation Conflict"),
+                { OperationResult: Common.OperationResultType.InvalidInput }
+                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest, title: "Invalid Request"),
+                { OperationResult: Common.OperationResultType.Created, Entity: null }
+                    => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem"),
+                _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem")
+            };
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
+        }
     }
 
-    [HttpDelete("{id}", Name = "DeleteTodoItem")]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesDefaultResponseType]
-    public async Task<IActionResult> Delete(long id)
+    [HttpPut("{id:long}", Name = "UpdateTodoItem")]
+    public async Task<IActionResult> Put(TodoItem todoItem, CancellationToken cancellationToken = default)
     {
-        var todoItem = await _todoItemRepository.DeleteTodoItem(id);
-
-        if(todoItem == null)
+        try
         {
-            return NotFound();
-        }
+            var operationResult = await _todoItemService.UpdateTodoItemAsync(todoItem, cancellationToken);
 
-        return NoContent();
+            ActionResult response = operationResult switch
+            {
+                { OperationResult: Common.OperationResultType.Modified, Entity: { } }
+                    => Ok(operationResult.Entity),
+                { OperationResult: Common.OperationResultType.Conflict }
+                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict),
+                { OperationResult: Common.OperationResultType.InvalidInput }
+                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest),
+                { OperationResult: Common.OperationResultType.NotFound }
+                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound),
+                { OperationResult: Common.OperationResultType.Modified, Entity: null }
+                    => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem"),
+                _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem")
+            };
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "unexpected error occured while attempting to update.");
+        }
+    }
+
+    [HttpDelete("{id:long}", Name = "DeleteTodoItem")]
+    public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await _todoItemService.DeleteTodoItemAsync(id, cancellationToken) is not null ?
+                NoContent() :
+                Problem(detail: $"a todo item with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected error ocurred.");
+        }
     }
 
     

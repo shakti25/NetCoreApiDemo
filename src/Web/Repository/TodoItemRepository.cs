@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RToora.DemoApi.Web.Common;
 using RToora.DemoApi.Web.DB;
+using RToora.DemoApi.Web.Helpers;
 using RToora.DemoApi.Web.Models;
 
 namespace RToora.DemoApi.Web.Repository;
@@ -15,61 +17,88 @@ public class TodoItemRepository : ITodoItemRepository
         _logger = logger;
     }
 
-    public async Task<TodoItemDTO> CreateTodoItem(TodoItem todoItem)
+    public async Task<IReadOnlyList<TodoItemDTO>?> GetTodoItemsAsync(CancellationToken cancellationToken = default)
     {
-        _context.TodoItems.Add(todoItem);
-
-        await _context.SaveChangesAsync();
-
         // To prevent from overposting attacks we are using ItemToDTO method.
-        return ItemToDTO(todoItem);
+        // Review AsNoTracking() and IReadOnlyList.
+        return await _context.TodoItems.
+            Select(ti => TodoItemHelper.ItemToDTO(ti)).
+            AsNoTracking().
+            ToListAsync();
     }
 
-    public async Task<TodoItemDTO?> DeleteTodoItem(long id)
+    public async Task<TodoItem?> GetTodoItemAsync(long id, CancellationToken cancellationToken = default)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await _context.TodoItems.SingleOrDefaultAsync(ti => ti.Id == id, cancellationToken);
 
-        if (todoItem == null)
+        // To prevent from overposting attacks we are using ItemToDTO method.
+        return todoItem != null ? todoItem : null;
+    }
+
+    public async Task<EntityOperationResult<TodoItemDTO>> CreateTodoItemAsync(TodoItem todoItem, CancellationToken cancellationToken = default)
+    {
+        if(todoItem is null)
+        {
+            return new(OperationResultType.NotFound, message: "");
+        }
+
+        try
+        {
+            _context.TodoItems.Add(todoItem);
+
+            await _context.SaveChangesAsync();
+
+            // To prevent from overposting attacks we are using ItemToDTO method.
+            return new(OperationResultType.Created, TodoItemHelper.ItemToDTO(todoItem), "Todo Item was created successfully");
+        }
+        catch (Exception ex)
+        {
+            return new(OperationResultType.UnexpectedError, message: ex.ToString());
+        }
+    }
+
+    public async Task<EntityOperationResult<TodoItemDTO>> UpdateTodoItemAsync(TodoItem todoItem, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if(todoItem is null)
+            {
+                return new(OperationResultType.NotFound, message: $"TodoItem with id {todoItem.Id} does not exist");
+            }
+
+            _context.Entry(todoItem).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return new(OperationResultType.Modified, TodoItemHelper.ItemToDTO(todoItem), "TodoItem was updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return new(OperationResultType.UnexpectedError, message: ex.ToString());
+        }
+    }
+
+    public async Task<long?> DeleteTodoItemAsync(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var todoItem = await _context.TodoItems.FindAsync(id);
+
+            if (todoItem is not null)
+            {
+                _context.TodoItems.Remove(todoItem);
+                await _context.SaveChangesAsync();
+            }
+
+            return null;
+        }
+        catch (Exception)
         {
             return null;
         }
-
-        _context.TodoItems.Remove(todoItem);
-
-        await _context.SaveChangesAsync();
-
-        return new TodoItemDTO();
     }
 
-    public async Task<TodoItemDTO?> GetTodoItem(long id)
+    public async Task<bool> TodoItemExistsAsync(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
-
-        // To prevent from overposting attacks we are using ItemToDTO method.
-        return todoItem != null ? ItemToDTO(todoItem) : null;
+        return await _context.TodoItems.AnyAsync(e => e.Id == id);
     }
-
-    public async Task<List<TodoItemDTO>> GetTodoItems()
-    {
-        // To prevent from overposting attacks we are using ItemToDTO method.
-        return await _context.TodoItems.Select(x => ItemToDTO(x)).ToListAsync();
-    }
-
-    public async Task UpdateTodoItem(TodoItem todoItem)
-    {
-        _context.Entry(todoItem).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-    }
-
-    public bool TodoItemExists(long id)
-    {
-        return _context.TodoItems.Any(e => e.Id == id);
-    }
-
-    private static TodoItemDTO ItemToDTO(TodoItem todoItem) => new TodoItemDTO
-    {
-        Id = todoItem.Id,
-        Name = todoItem.Name,
-        IsComplete = todoItem.IsComplete
-    };
 }

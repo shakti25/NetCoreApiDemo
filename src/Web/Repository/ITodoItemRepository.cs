@@ -1,13 +1,14 @@
-﻿using RToora.DemoApi.Web.Models;
+﻿using RToora.DemoApi.Web.Common;
+using RToora.DemoApi.Web.Models;
 
 namespace RToora.DemoApi.Web.Repository;
 
 public interface ITodoItemRepository
 {
-    Task<List<TodoItemDTO>> GetTodoItems();
-    Task<TodoItemDTO?> GetTodoItem(long id);
-    Task UpdateTodoItem(TodoItem todoItem);
-    Task<TodoItemDTO> CreateTodoItem(TodoItem todoItem);
-    Task<TodoItemDTO?> DeleteTodoItem(long id);
-    bool TodoItemExists(long id);
+    Task<IReadOnlyList<TodoItemDTO>?> GetTodoItemsAsync(CancellationToken cancellationToken);
+    Task<TodoItem?> GetTodoItemAsync(long id, CancellationToken cancellationToken);
+    Task<EntityOperationResult<TodoItemDTO>> CreateTodoItemAsync(TodoItem todoItem, CancellationToken cancellationToken);
+    Task<EntityOperationResult<TodoItemDTO>> UpdateTodoItemAsync(TodoItem todoItem, CancellationToken cancellationToken);
+    Task<long?> DeleteTodoItemAsync(long id, CancellationToken cancellationToken);
+    Task<bool> TodoItemExistsAsync(long id);
 }
