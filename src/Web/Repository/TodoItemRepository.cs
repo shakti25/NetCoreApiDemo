@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RToora.DemoApi.Web.Common;
 using RToora.DemoApi.Web.DB;
+using RToora.DemoApi.Web.Entities;
 using RToora.DemoApi.Web.Helpers;
 using RToora.DemoApi.Web.Models;
 

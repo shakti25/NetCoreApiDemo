@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RToora.DemoApi.Web.Models;
+using RToora.DemoApi.Web.Entities;
 
 namespace RToora.DemoApi.Web.DB;
 

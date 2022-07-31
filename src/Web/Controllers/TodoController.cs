@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RToora.DemoApi.Web.Entities;
 using RToora.DemoApi.Web.Models;
 using RToora.DemoApi.Web.Services;
 

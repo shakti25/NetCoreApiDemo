@@ -1,4 +1,4 @@
-﻿namespace RToora.DemoApi.Web.Models;
+﻿namespace RToora.DemoApi.Web.Entities;
 public class TodoItem
 {
     public long Id { get; set; }

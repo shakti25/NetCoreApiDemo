@@ -1,4 +1,5 @@
-﻿using RToora.DemoApi.Web.Models;
+﻿using RToora.DemoApi.Web.Entities;
+using RToora.DemoApi.Web.Models;
 
 namespace RToora.DemoApi.Web.Helpers;
 
