@@ -33,6 +33,10 @@ builder.Services.AddSwaggerGen(options => {
             Url = new Uri("https://license.example.com")
         }
     });
+
+    // using System.Reflection;
+    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var app = builder.Build();

@@ -118,6 +118,12 @@ public class TodoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Deletes a specific TodoItem.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpDelete("{id:long}", Name = "DeleteTodoItem")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
     {
