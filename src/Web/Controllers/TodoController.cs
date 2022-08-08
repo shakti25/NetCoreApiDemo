@@ -5,8 +5,9 @@ using RToora.DemoApi.Web.Services;
 
 namespace RToora.DemoApi.Web.Controllers;
 
-[Route("/api/[controller]")]
 [ApiController]
+[Route("/api/[controller]")]
+[Produces("application/json")]
 public class TodoController : ControllerBase
 {
     private readonly ILogger<TodoController> _logger;
