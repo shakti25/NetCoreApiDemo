@@ -19,7 +19,15 @@ public class TodoController : ControllerBase
         _todoItemService = todoItemService;
     }
 
+    /// <summary>
+    /// Get all Todo Items
+    /// </summary>
+    /// <returns></returns>
+    /// <response code="200">Returns all Todo Items</response>
+    /// <response code="500">There was an error</response>
     [HttpGet(Name = "GetTodoItem")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get()
     {
         try
@@ -36,7 +44,19 @@ public class TodoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get a Todo Item by Id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>test</returns>
+    /// <response code="200">Return specific Todo Item</response>
+    /// <response code="404">Todo Item by Id was not found</response>
+    /// <response code="500">There was an error</response>
     [HttpGet("{id:long}", Name = "GetTodoItemById")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(long id, CancellationToken cancellationToken = default)
     {
         try
@@ -72,7 +92,15 @@ public class TodoController : ControllerBase
     ///     }
     /// 
     /// </remarks>
+    /// <response code="201">Todo Item was created.</response>
+    /// <response code="404">Todo Item was not found.</response>
+    /// <response code="409">Todo Item had a creation conflict.</response>
+    /// <response code="400">There was a bad request.</response>
     [HttpPost(Name = "CreateTodoItem")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromBody]TodoItem todoItem, CancellationToken cancellationToken = default)
     {
         try
@@ -86,7 +114,7 @@ public class TodoController : ControllerBase
                 { OperationResult: Common.OperationResultType.NotFound } 
                     => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound, title: "Not Found"),
                 { OperationResult: Common.OperationResultType.Conflict }
-                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict, title: "Creation Conflict"),
+                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict, title: "Update Conflict"),
                 { OperationResult: Common.OperationResultType.InvalidInput }
                     => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest, title: "Invalid Request"),
                 { OperationResult: Common.OperationResultType.Created, Entity: null }
@@ -104,7 +132,21 @@ public class TodoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update specified Todo Item.
+    /// </summary>
+    /// <param name="todoItem"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <response code="200">Todo Item was updated</response>
+    /// <response code="404">Todo Item was not found.</response>
+    /// <response code="409">Todo Item had an updation conflict.</response>
+    /// <response code="400">There was a bad request.</response>
     [HttpPut("{id:long}", Name = "UpdateTodoItem")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put(TodoItem todoItem, CancellationToken cancellationToken = default)
     {
         try
@@ -142,7 +184,11 @@ public class TodoController : ControllerBase
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    /// <response code="204">No Content</response>
+    /// <response code="404">Todo Item was not found</response>
     [HttpDelete("{id:long}", Name = "DeleteTodoItem")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
     {
         try
@@ -158,6 +204,4 @@ public class TodoController : ControllerBase
             return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected error ocurred.");
         }
     }
-
-    
 }
