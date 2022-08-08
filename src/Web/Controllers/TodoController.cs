@@ -26,8 +26,8 @@ public class TodoController : ControllerBase
     /// <response code="200">Returns all Todo Items</response>
     /// <response code="500">There was an error</response>
     [HttpGet(Name = "GetTodoItem")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(500)]
     public async Task<IActionResult> Get()
     {
         try
