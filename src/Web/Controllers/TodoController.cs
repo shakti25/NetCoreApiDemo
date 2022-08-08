@@ -54,7 +54,24 @@ public class TodoController : ControllerBase
         }
     }
 
-    [HttpPost(Name = "PostTodoItem")]
+    /// <summary>
+    /// Creates a TodoItem.
+    /// </summary>
+    /// <param name="todoItem"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A newly created TodoItem</returns>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     POST /Todo
+    ///     {
+    ///         "id": 1,
+    ///         "name": "Item #1",
+    ///         "isComplete": false
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost(Name = "CreateTodoItem")]
     public async Task<IActionResult> Post([FromBody]TodoItem todoItem, CancellationToken cancellationToken = default)
     {
         try
