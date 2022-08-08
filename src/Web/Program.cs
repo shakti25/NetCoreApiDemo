@@ -58,6 +58,8 @@ if (app.Environment.IsDevelopment())
         // This will server Swagger UI at app's root
         //options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         //options.RoutePrefix = string.Empty;
+
+        options.InjectStylesheet("/css/swagger-ui/custom.css");
     });
     
     app.UseDeveloperExceptionPage();  // app.UseExceptionHandler("/error");  // when running on non-dev environments. https://docs.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-6.0    
@@ -66,6 +68,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 
