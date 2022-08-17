@@ -9,13 +9,12 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: dotnetdemoapi
-  AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
-  DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
+  AZURE_WEBAPP_NAME: NetCoreApiDemo-RT-001
+  AZURE_WEBAPP_PACKAGE_PATH: "." # Set this to the path to your web app project, defaults to the repository root:
+  DOTNET_VERSION: "6.0.x" # The .NET SDK version to use
 
 jobs:
   publish:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -45,6 +44,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/src/dotnet-api'
-
-      
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/src/dotnet-api"
