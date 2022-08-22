@@ -2,10 +2,10 @@ name: publish
 
 on:
   # Runs the workflow automatically after the build/test workflow is COMPLETED
-  workflow_run:
-    workflows: ["build/test"]
-    types:
-      - "completed"
+  # workflow_run:
+  #   workflows: ["build/test"]
+  #   types:
+  #     - "completed"
   workflow_dispatch:
 
 env:
