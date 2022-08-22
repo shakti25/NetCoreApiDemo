@@ -1,4 +1,4 @@
-name: publish
+name: publish web app
 
 on:
   # Runs the workflow automatically after the build/test workflow is COMPLETED
