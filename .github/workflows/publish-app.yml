@@ -15,6 +15,7 @@ env:
 
 jobs:
   publish:
+    name: Azure Deploy
     runs-on: windows-latest
 
     steps:
@@ -25,19 +26,17 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install dependencies
+      - name: Restore dependencies
         run: dotnet restore
 
       - name: Build
         run: |
-          cd src/Web
           dotnet build -c Release --no-restore
-          dotnet publish -c Release -o ../dotnet-api -r linux-x64 --self-contained true /p:UseAppHost=true
+          dotnet publish -c Release -o deployment
 
       - name: Test
         run: |
-          cd test/Web
-          dotnet test --no-restore --verbosity normal
+          dotnet test --no-build --verbosity normal
 
       - name: Deploy
         uses: azure/webapps-deploy@v2

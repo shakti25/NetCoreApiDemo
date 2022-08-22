@@ -1,20 +1,31 @@
 name: build/test
 
 on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "reason to trigger"
+        required: true
+        default: "testing"
   push:
+    branches:
+      - main
     paths:
-      - '**.cs'
-      - '**.csproj'
+      - "**.cs"
+      - "**.csproj"
   pull_request:
-    branches: [ "main" ]
-    types: [opened, synchronize, reopened]
-    
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
 env:
-  DOTNET_VERSION: '6.0.x'
+  DOTNET_VERSION: "6.0.x"
 
 jobs:
   build-and-test:
-
     name: build-and-test-${{matrix.os}}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -22,21 +33,21 @@ jobs:
     #   TEST: "some-test"
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest] # macOS-latest => not needed
+        os: [windows-latest] # ,ubuntu-latest,macOS-latest => not needed
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-        
-    - name: Execute Tests
-      run: dotnet test --no-restore --verbosity normal
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run Tests
+        run: dotnet test --no-build --verbosity normal
