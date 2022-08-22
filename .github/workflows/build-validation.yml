@@ -26,14 +26,16 @@ env:
 
 jobs:
   build-and-test:
-    name: build-and-test-${{matrix.os}}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
     # env:
     #   TEST: "some-test"
     strategy:
       matrix:
-        os: [windows-latest] # ,ubuntu-latest,macOS-latest => not needed
+        os: # ,ubuntu-latest,macOS-latest => not needed
+          - windows-latest
+
+    name: build-and-test-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v3
