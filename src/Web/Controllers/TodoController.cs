@@ -13,10 +13,10 @@ public class TodoController : ControllerBase
     private readonly ILogger<TodoController> _logger;
     private readonly ITodoItemService _todoItemService;
 
-    public TodoController(ILogger<TodoController> logger, ITodoItemService todoItemService)
+    public TodoController(ILogger<TodoController> logger) //, ITodoItemService todoItemService
     {
         _logger = logger;
-        _todoItemService = todoItemService;
+        //_todoItemService = todoItemService;
     }
 
     /// <summary>
@@ -32,7 +32,12 @@ public class TodoController : ControllerBase
     {
         try
         {
-            var todoItems = await _todoItemService.GetTodoItemsAsync();
+            var todoItems = new TodoItemDTO[] //await _todoItemService.GetTodoItemsAsync();
+            { 
+                new TodoItemDTO{ Id = 1, Name = "test 1", IsComplete = false },
+                new TodoItemDTO{ Id = 2, Name = "test 2", IsComplete = false },
+                new TodoItemDTO{ Id = 3, Name = "test 3", IsComplete = true }
+            };  
 
             return Ok(todoItems ?? Array.Empty<TodoItemDTO>());
         }
@@ -53,27 +58,27 @@ public class TodoController : ControllerBase
     /// <response code="200">Return specific Todo Item</response>
     /// <response code="404">Todo Item by Id was not found</response>
     /// <response code="500">There was an error</response>
-    [HttpGet("{id:long}", Name = "GetTodoItemById")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Get(long id, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var todoItem = await _todoItemService.GetTodoItemByIdAsync(id, cancellationToken);
+    //[HttpGet("{id:long}", Name = "GetTodoItemById")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> Get(long id, CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        var todoItem = await _todoItemService.GetTodoItemByIdAsync(id, cancellationToken);
 
-            return (todoItem is not null) ?
-                Ok(todoItem) :
-                Problem(detail: $"TodoItem with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
+    //        return (todoItem is not null) ?
+    //            Ok(todoItem) :
+    //            Problem(detail: $"TodoItem with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, ex.Message);
 
-            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
-        }
-    }
+    //        return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
+    //    }
+    //}
 
     /// <summary>
     /// Creates a TodoItem.
@@ -96,41 +101,41 @@ public class TodoController : ControllerBase
     /// <response code="404">Todo Item was not found.</response>
     /// <response code="409">Todo Item had a creation conflict.</response>
     /// <response code="400">There was a bad request.</response>
-    [HttpPost(Name = "CreateTodoItem")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Post([FromBody]TodoItem todoItem, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var operationResult = await _todoItemService.CreateTodoItemAsync(todoItem, cancellationToken);
+    //[HttpPost(Name = "CreateTodoItem")]
+    //[ProducesResponseType(StatusCodes.Status201Created)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //[ProducesResponseType(StatusCodes.Status409Conflict)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //public async Task<IActionResult> Post([FromBody]TodoItem todoItem, CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        var operationResult = await _todoItemService.CreateTodoItemAsync(todoItem, cancellationToken);
 
-            ActionResult response = operationResult switch
-            {
-                { OperationResult: Common.OperationResultType.Created, Entity: { } } 
-                    => Created($"api/", operationResult.Entity),
-                { OperationResult: Common.OperationResultType.NotFound } 
-                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound, title: "Not Found"),
-                { OperationResult: Common.OperationResultType.Conflict }
-                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict, title: "Update Conflict"),
-                { OperationResult: Common.OperationResultType.InvalidInput }
-                    => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest, title: "Invalid Request"),
-                { OperationResult: Common.OperationResultType.Created, Entity: null }
-                    => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem"),
-                _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem")
-            };
+    //        ActionResult response = operationResult switch
+    //        {
+    //            { OperationResult: Common.OperationResultType.Created, Entity: { } } 
+    //                => Created($"api/", operationResult.Entity),
+    //            { OperationResult: Common.OperationResultType.NotFound } 
+    //                => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound, title: "Not Found"),
+    //            { OperationResult: Common.OperationResultType.Conflict }
+    //                => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict, title: "Update Conflict"),
+    //            { OperationResult: Common.OperationResultType.InvalidInput }
+    //                => Problem(operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest, title: "Invalid Request"),
+    //            { OperationResult: Common.OperationResultType.Created, Entity: null }
+    //                => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem"),
+    //            _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to create TodoItem")
+    //        };
 
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
+    //        return response;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, ex.Message);
 
-            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
-        }
-    }
+    //        return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected Error occured.");
+    //    }
+    //}
 
     /// <summary>
     /// Update specified Todo Item.
@@ -142,41 +147,41 @@ public class TodoController : ControllerBase
     /// <response code="404">Todo Item was not found.</response>
     /// <response code="409">Todo Item had an updation conflict.</response>
     /// <response code="400">There was a bad request.</response>
-    [HttpPut("{id:long}", Name = "UpdateTodoItem")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put(TodoItem todoItem, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var operationResult = await _todoItemService.UpdateTodoItemAsync(todoItem, cancellationToken);
+    //[HttpPut("{id:long}", Name = "UpdateTodoItem")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status409Conflict)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public async Task<IActionResult> Put(TodoItem todoItem, CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        var operationResult = await _todoItemService.UpdateTodoItemAsync(todoItem, cancellationToken);
 
-            ActionResult response = operationResult switch
-            {
-                { OperationResult: Common.OperationResultType.Modified, Entity: { } }
-                    => Ok(operationResult.Entity),
-                { OperationResult: Common.OperationResultType.Conflict }
-                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict),
-                { OperationResult: Common.OperationResultType.InvalidInput }
-                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest),
-                { OperationResult: Common.OperationResultType.NotFound }
-                    => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound),
-                { OperationResult: Common.OperationResultType.Modified, Entity: null }
-                    => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem"),
-                _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem")
-            };
+    //        ActionResult response = operationResult switch
+    //        {
+    //            { OperationResult: Common.OperationResultType.Modified, Entity: { } }
+    //                => Ok(operationResult.Entity),
+    //            { OperationResult: Common.OperationResultType.Conflict }
+    //                => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status409Conflict),
+    //            { OperationResult: Common.OperationResultType.InvalidInput }
+    //                => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status400BadRequest),
+    //            { OperationResult: Common.OperationResultType.NotFound }
+    //                => Problem(detail: operationResult.ErrorMessage, statusCode: StatusCodes.Status404NotFound),
+    //            { OperationResult: Common.OperationResultType.Modified, Entity: null }
+    //                => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem"),
+    //            _ => Problem(detail: operationResult.ErrorMessage, title: "Unable to update todoItem")
+    //        };
 
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
+    //        return response;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, ex.Message);
 
-            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "unexpected error occured while attempting to update.");
-        }
-    }
+    //        return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "unexpected error occured while attempting to update.");
+    //    }
+    //}
 
     /// <summary>
     /// Deletes a specific TodoItem.
@@ -186,22 +191,22 @@ public class TodoController : ControllerBase
     /// <returns></returns>
     /// <response code="204">No Content</response>
     /// <response code="404">Todo Item was not found</response>
-    [HttpDelete("{id:long}", Name = "DeleteTodoItem")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return await _todoItemService.DeleteTodoItemAsync(id, cancellationToken) is not null ?
-                NoContent() :
-                Problem(detail: $"a todo item with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
+    //[HttpDelete("{id:long}", Name = "DeleteTodoItem")]
+    //[ProducesResponseType(StatusCodes.Status204NoContent)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        return await _todoItemService.DeleteTodoItemAsync(id, cancellationToken) is not null ?
+    //            NoContent() :
+    //            Problem(detail: $"a todo item with id {id} does not exist", statusCode: StatusCodes.Status404NotFound);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, ex.Message);
 
-            return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected error ocurred.");
-        }
-    }
+    //        return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message, title: "Unexpected error ocurred.");
+    //    }
+    //}
 }

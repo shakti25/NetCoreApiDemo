@@ -6,10 +6,10 @@ using RToora.DemoApi.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
-builder.Services.AddScoped<ITodoItemService, TodoItemService>();
+//builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
+//builder.Services.AddScoped<ITodoItemService, TodoItemService>();
 
-builder.Services.AddDbContext<TodoContext>(options => options.UseInMemoryDatabase("TodoList"));
+//builder.Services.AddDbContext<TodoContext>(options => options.UseInMemoryDatabase("TodoList"));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
